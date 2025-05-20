@@ -28,7 +28,6 @@ function formatTimestamp(timestamp) {
     const earliestCheckinsByPerson = {};
     const lastCheckinByPerson = {};
 
-    console.log(validCheckins);
     validCheckins.forEach((checkin) => {
       const date = checkin.date;
       const personKey = `${date}_${checkin.personID}`;
@@ -280,7 +279,7 @@ const App = () => {
       }
 
       if (Array.isArray(result)) {
-        console.log(result.length);
+        console.log(result);
         const filterItems = filterCheckinsByDay(result);
         setResultsData(filterItems);
         setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
