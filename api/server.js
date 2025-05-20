@@ -15,6 +15,7 @@ app.use(
     origin: [
       "https://client-i1vo1qjv7-fugboizzs-projects.vercel.app",
       "http://localhost:3000",
+      "https://client-hanet-re41.vercel.app"
     ],
   })
 );
