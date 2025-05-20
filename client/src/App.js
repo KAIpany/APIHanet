@@ -279,7 +279,6 @@ const App = () => {
       }
 
       if (Array.isArray(result)) {
-        console.log(result);
         const filterItems = filterCheckinsByDay(result);
         setResultsData(filterItems);
         setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
