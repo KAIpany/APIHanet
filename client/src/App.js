@@ -16,7 +16,7 @@ function formatTimestamp(timestamp) {
       return [];
     }
 
-    const validCheckins = data.data.filter(
+    const validCheckins = data.filter(
       (item) =>
         item.personID &&
         item.personID !== "" &&
