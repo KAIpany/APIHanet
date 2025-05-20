@@ -19,7 +19,7 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [resultsData, setResultsData] = useState(null);
   const [queryString, setQueryString] = useState(null);
-  const hanetServiceId = require(require('../../api/hanetServideId.js'));
+  const hanetServiceId = require('../../api/hanetServiceId.js');
   const fetchPlaces = useCallback(async () => {
     setIsPlacesLoading(true);
     setPlaceError(null);
