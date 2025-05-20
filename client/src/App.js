@@ -156,7 +156,7 @@ const App = () => {
     }
 
     try {
-      const result = await hanetServiceId.getPeopleListByMethod(formData.placeId, new Date(formData.fromDateTime).getTime().toString(), new Date(formData.toDateTime).getTime().toString(), formData.deviceId);
+      const result = await getPeopleListByMethod(formData.placeId, new Date(formData.fromDateTime).getTime().toString(), new Date(formData.toDateTime).getTime().toString(), formData.deviceId);
       console.log(result);
 
       if (Array.isArray(result)) {
