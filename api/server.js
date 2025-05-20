@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3001;
 app.use(
   cors({
     origin: [
-      "https://api-hanet.vercel.app/api/place",
+      "https://api-hanet.vercel.app",
       "http://localhost:3000",
       "https://client-hanet-re41.vercel.app"
     ],
