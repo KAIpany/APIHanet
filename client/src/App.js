@@ -31,7 +31,7 @@ function formatTimestamp(timestamp) {
     validCheckins.forEach((checkin) => {
       const date = checkin.date;
       const personKey = `${date}_${checkin.personID}`;
-      
+      console.log(checkin);
 
       // Format thông tin người check-in
       const personInfo = {
