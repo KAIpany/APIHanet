@@ -28,10 +28,10 @@ function formatTimestamp(timestamp) {
     const earliestCheckinsByPerson = {};
     const lastCheckinByPerson = {};
 
+    console.log(validCheckins);
     validCheckins.forEach((checkin) => {
       const date = checkin.date;
       const personKey = `${date}_${checkin.personID}`;
-      console.log(checkin);
 
       // Format thông tin người check-in
       const personInfo = {
