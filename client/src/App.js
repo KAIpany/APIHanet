@@ -156,6 +156,7 @@ const App = () => {
     validCheckins.forEach((checkin) => {
       const date = checkin.date;
       const personKey = `${date}_${checkin.personID}`;
+      
 
       // Format thông tin người check-in
       const personInfo = {
@@ -174,24 +175,25 @@ const App = () => {
         date: checkin.date,
         timestamp: checkin.checkinTime,
         formattedTime: formatTimestamp(checkin.checkinTime),
+        outtimestamp: null
       };
 
       if (
-        !earliestCheckinsByPerson[personKey.concat(date)] ||
+        !earliestCheckinsByPerson[personKey] ||
         checkin.checkinTime < earliestCheckinsByPerson[personKey].timestamp
       ) {
         earliestCheckinsByPerson[personKey] = personInfo;
       }
       
       if (
-        !lastCheckinByPerson[personKey.concat(date)] ||
+        !lastCheckinByPerson[personKey] ||
         checkin.checkinTime > lastCheckinByPerson[personKey].timestamp
       ) {
         lastCheckinByPerson[personKey] = personInfo;
       }
     });
     Object.keys(earliestCheckinsByPerson).forEach((key) => {
-      earliestCheckinsByPerson[key]["outtimestamp"] = lastCheckinByPerson[key].timestamp;
+      earliestCheckinsByPerson[key].outtimestamp = lastCheckinByPerson[key].timestamp;
     });
       
     const result = Object.values(earliestCheckinsByPerson).sort(
@@ -204,6 +206,13 @@ const App = () => {
     console.error("Lỗi khi xử lý dữ liệu:", error);
     return [];
   }
+}
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
 }
 
   const handleSubmit = async (event) => {
