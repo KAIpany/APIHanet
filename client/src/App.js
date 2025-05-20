@@ -50,8 +50,6 @@ function formatTimestamp(timestamp) {
         date: checkin.date,
         timestamp: checkin.checkinTime,
         formattedTime: date.concat(" ",formatTimestamp(checkin.checkinTime)),
-        formattedOutTime: "",
-        outtimestamp: null,
       };
 
       if (
@@ -69,8 +67,8 @@ function formatTimestamp(timestamp) {
       }
     });
     Object.keys(earliestCheckinsByPerson).forEach((key) => {  
-        console.log(earliestCheckinsByPerson[key]);
-        console.log(lastCheckinByPerson[key]);
+        console.log(key,earliestCheckinsByPerson[key]);
+        console.log(key,lastCheckinByPerson[key]);
       if (lastCheckinByPerson[key]) {
         earliestCheckinsByPerson[key].outtimestamp = lastCheckinByPerson[key].timestamp;
         earliestCheckinsByPerson[key].formattedOutTime = lastCheckinByPerson[key].formattedInTime;
@@ -274,7 +272,6 @@ const App = () => {
     try {
       const response = await fetch(apiUrl);
       const result = await response.json();
-      console.log(result);
 
       if (!response.ok) {
         throw new Error(
@@ -285,7 +282,6 @@ const App = () => {
       if (Array.isArray(result)) {
         const filterItems = filterCheckinsByDay(result);
         setResultsData(filterItems);
-
         setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
       } else {
         setResultsData([]);
