@@ -11,12 +11,12 @@ function formatTimestamp(timestamp) {
   }
   function filterCheckinsByDay(data) {
   try {
-    if (!data || !data.data || !Array.isArray(data.data)) {
+    if (!data || !Array.isArray(data)) {
       console.error("Dữ liệu đầu vào không hợp lệ!");
       return [];
     }
 
-    const validCheckins = data.data.filter(
+    const validCheckins = data.filter(
       (item) =>
         item.personID &&
         item.personID !== "" &&
