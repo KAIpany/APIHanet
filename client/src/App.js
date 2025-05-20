@@ -49,8 +49,9 @@ function formatTimestamp(timestamp) {
         deviceName: checkin.deviceName !== undefined ? checkin.deviceName : "",
         date: checkin.date,
         timestamp: checkin.checkinTime,
-        formattedTime: formatTimestamp(checkin.checkinTime),
-        outtimestamp: null
+        formattedInTime: formatTimestamp(checkin.checkinTime),
+        outtimestamp: null,
+        formattedOutTime: null
       };
 
       if (
@@ -70,6 +71,7 @@ function formatTimestamp(timestamp) {
     Object.keys(earliestCheckinsByPerson).forEach((key) => {  
       if (lastCheckinByPerson[key]) {
         earliestCheckinsByPerson[key].outtimestamp = lastCheckinByPerson[key].timestamp;
+        earliestCheckinsByPerson[key].formattedOutTime = formatTimestamp(lastCheckinByPerson[key].timestamp);
       }
     });
       
@@ -460,6 +462,7 @@ const App = () => {
                     <th>AliasID</th>
                     <th>Chức vụ</th>
                     <th>Thời gian Checkin</th>
+                    <th>Thời gian Checkout</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -471,9 +474,10 @@ const App = () => {
                       <td>{result.aliasID || "N/A"}</td>
                       <td>{result.title || "N/A"}</td>
                       <td>
-                        {result.checkinTime
-                          ? new Date(result.checkinTime).toLocaleString("vi-VN")
-                          : "N/A"}
+                        {result.formattedInTime || "N/A"}
+                      </td>
+                      <td>
+                        {result.formattedOutTime || "N/A"}
                       </td>
                     </tr>
                   ))}
