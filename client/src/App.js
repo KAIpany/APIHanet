@@ -11,7 +11,7 @@ function formatTimestamp(timestamp) {
   }
   function filterCheckinsByDay(data) {
   try {
-    if (!data || !data.data || !Array.isArray(data.data)) {
+    if (!data || !Array.isArray(data)) {
       console.error("Dữ liệu đầu vào không hợp lệ!");
       return [];
     }
@@ -71,7 +71,7 @@ function formatTimestamp(timestamp) {
     Object.keys(earliestCheckinsByPerson).forEach((key) => {  
       if (lastCheckinByPerson[key]) {
         earliestCheckinsByPerson[key].outtimestamp = lastCheckinByPerson[key].timestamp;
-        earliestCheckinsByPerson[key].formattedOutTime = formatTimestamp(lastCheckinByPerson[key].timestamp);
+        earliestCheckinsByPerson[key].formattedOutTime = lastCheckinByPerson[key].formattedInTime;
       }
     });
       
@@ -281,7 +281,7 @@ const App = () => {
       }
 
       if (Array.isArray(result)) {
-        const filterItems = filterCheckinsByDay(result);
+        const filterItems = filterCheckinsByDay(data: result);
         setResultsData(filterItems);
         console.log("asdasd", resultsData);
 
