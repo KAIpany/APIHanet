@@ -11,12 +11,12 @@ function formatTimestamp(timestamp) {
   }
   function filterCheckinsByDay(data) {
   try {
-    if (!data || !Array.isArray(data)) {
+    if (!data || !data.data || !Array.isArray(data.data)) {
       console.error("Dữ liệu đầu vào không hợp lệ!");
       return [];
     }
 
-    const validCheckins = data.filter(
+    const validCheckins = data.data.filter(
       (item) =>
         item.personID &&
         item.personID !== "" &&
@@ -281,9 +281,11 @@ const App = () => {
       }
 
       if (Array.isArray(result)) {
-        const filterItems = filterCheckinsByDay(data: result);
+        const filterItems = filterCheckinsByDay(result);
         setResultsData(filterItems);
-        console.log("asdasd", resultsData);
+        setTimeout(() => {  console.log('Hi!'); }, 2000)
+        console.log("origin",result)
+        console.log("process", resultsData);
 
         setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
       } else {
