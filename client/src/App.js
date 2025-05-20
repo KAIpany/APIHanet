@@ -468,7 +468,7 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {resultsData.map((resultsData, index) => (
+                  {resultsData.map((result, index) => (
                     <tr key={result.personID + "_" + index}>
                       <td>{result.personName || "(Không tên)"}</td>
                       <td className="monospace">{result.personID}</td>
