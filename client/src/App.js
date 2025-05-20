@@ -69,6 +69,8 @@ function formatTimestamp(timestamp) {
       }
     });
     Object.keys(earliestCheckinsByPerson).forEach((key) => {  
+        console.log(earliestCheckinsByPerson[key]);
+        console.log(lastCheckinByPerson[key]);
       if (lastCheckinByPerson[key]) {
         earliestCheckinsByPerson[key].outtimestamp = lastCheckinByPerson[key].timestamp;
         earliestCheckinsByPerson[key].formattedOutTime = lastCheckinByPerson[key].formattedInTime;
@@ -283,9 +285,6 @@ const App = () => {
       if (Array.isArray(result)) {
         const filterItems = filterCheckinsByDay(result);
         setResultsData(filterItems);
-        setTimeout(() => {  console.log('Hi!'); }, 2000)
-        console.log("origin",result)
-        console.log("process", filterItems);
 
         setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
       } else {
