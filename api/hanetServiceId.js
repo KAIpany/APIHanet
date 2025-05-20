@@ -15,6 +15,7 @@ function filterCheckinsByDay(data) {
 
     // Tạo một đối tượng tạm để theo dõi lần check-in đầu tiên của mỗi người theo ngày
     const earliestCheckinsByPerson = {};
+    const lastCheckinByPerson = {};
 
     validCheckins.forEach((checkin) => {
       const date = checkin.date;
@@ -40,16 +41,27 @@ function filterCheckinsByDay(data) {
       };
 
       if (
-        !earliestCheckinsByPerson[personKey] ||
+        !earliestCheckinsByPerson[personKey.concat(date)] ||
         checkin.checkinTime < earliestCheckinsByPerson[personKey].timestamp
       ) {
         earliestCheckinsByPerson[personKey] = personInfo;
       }
+      
+      if (
+        !lastCheckinByPerson[personKey.concat(date)] ||
+        checkin.checkinTime > lastCheckinByPerson[personKey].timestamp
+      ) {
+        lastCheckinByPerson[personKey] = personInfo;
+      }
     });
-
+    Object.keys(earliestCheckinsByPerson).forEach((key) => {
+      earliestCheckinsByPerson[key]["outtimestamp"] = lastCheckinByPerson[key].timestamp;
+    });
+      
     const result = Object.values(earliestCheckinsByPerson).sort(
       (a, b) => a.timestamp - b.timestamp
     );
+    
 
     return result;
   } catch (error) {
