@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./App.css"; // Sẽ tạo file CSS riêng
-
+import "./hanetServiceId.js";
 const App = () => {
   const [formData, setFormData] = useState({
     placeId: "",
@@ -19,7 +19,6 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [resultsData, setResultsData] = useState(null);
   const [queryString, setQueryString] = useState(null);
-  const hanetServiceId = require('./hanetServiceId.js');
   const fetchPlaces = useCallback(async () => {
     setIsPlacesLoading(true);
     setPlaceError(null);
