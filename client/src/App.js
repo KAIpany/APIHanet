@@ -285,7 +285,7 @@ const App = () => {
         setResultsData(filterItems);
         setTimeout(() => {  console.log('Hi!'); }, 2000)
         console.log("origin",result)
-        console.log("process", resultsData);
+        console.log("process", filterItems);
 
         setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
       } else {
