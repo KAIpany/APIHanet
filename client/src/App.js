@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./App.css"; // Sẽ tạo file CSS riêng
-import "./hanetServiceId.js";
+
 const App = () => {
   const [formData, setFormData] = useState({
     placeId: "",
@@ -19,6 +19,7 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [resultsData, setResultsData] = useState(null);
   const [queryString, setQueryString] = useState(null);
+
   const fetchPlaces = useCallback(async () => {
     setIsPlacesLoading(true);
     setPlaceError(null);
@@ -139,7 +140,28 @@ const App = () => {
     setSuccessMessage(null);
     setResultsData(null);
 
+    const params = new URLSearchParams();
+    if (formData.placeId) params.append("placeId", formData.placeId);
+    if (formData.deviceId) params.append("deviceId", formData.deviceId);
     try {
+      if (formData.fromDateTime) {
+        params.append(
+          "dateFrom",
+          new Date(formData.fromDateTime).getTime().toString()
+        );
+      } else {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        params.append("dateFrom", today.getTime().toString());
+      }
+      if (formData.toDateTime) {
+        params.append(
+          "dateTo",
+          new Date(formData.toDateTime).getTime().toString()
+        );
+      } else {
+        params.append("dateTo", new Date().getTime().toString());
+      }
       if (
         formData.fromDateTime &&
         formData.toDateTime &&
@@ -154,10 +176,22 @@ const App = () => {
       setIsSubmitting(false);
       return;
     }
+    const queryString = params.toString();
+    setQueryString(queryString);
+
+    const apiUrl = `${process.env.REACT_APP_API_URL}/api/checkins?${queryString}`;
+    console.log("Đang gọi API:", apiUrl);
 
     try {
-      const result = await getPeopleListByMethod(formData.placeId, new Date(formData.fromDateTime).getTime().toString(), new Date(formData.toDateTime).getTime().toString(), formData.deviceId);
+      const response = await fetch(apiUrl);
+      const result = await response.json();
       console.log(result);
+
+      if (!response.ok) {
+        throw new Error(
+          `Lỗi ${response.status}: ${result.message || "Không thể lấy dữ liệu"}`
+        );
+      }
 
       if (Array.isArray(result)) {
         setResultsData(result);
@@ -340,7 +374,6 @@ const App = () => {
                     <th>AliasID</th>
                     <th>Chức vụ</th>
                     <th>Thời gian Checkin</th>
-                    <th>Thời gian Checkout</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -352,13 +385,8 @@ const App = () => {
                       <td>{result.aliasID || "N/A"}</td>
                       <td>{result.title || "N/A"}</td>
                       <td>
-                        {result.timestamp
-                          ? new Date(result.timestamp).toLocaleString("vi-VN")
-                          : "N/A"}
-                      </td>
-                      <td>
-                        {result.outtimestamp
-                          ? new Date(result.outtimestamp).toLocaleString("vi-VN")
+                        {result.checkinTime
+                          ? new Date(result.checkinTime).toLocaleString("vi-VN")
                           : "N/A"}
                       </td>
                     </tr>
