@@ -48,8 +48,8 @@ function formatTimestamp(timestamp) {
         deviceID: checkin.deviceID !== undefined ? checkin.deviceID : "",
         deviceName: checkin.deviceName !== undefined ? checkin.deviceName : "",
         date: checkin.date,
-        timestamp: checkin.checkinTime,
-        formattedTime: date.concat(" ",formatTimestamp(checkin.checkinTime)),
+        timestamp: checkin.timestamp,
+        formattedTime: date.concat(" ",checkin.formattedTime),
       };
 
       if (
@@ -71,7 +71,7 @@ function formatTimestamp(timestamp) {
         console.log(key,lastCheckinByPerson[key]);
       if (lastCheckinByPerson[key]) {
         earliestCheckinsByPerson[key].outtimestamp = lastCheckinByPerson[key].timestamp;
-        earliestCheckinsByPerson[key].formattedOutTime = lastCheckinByPerson[key].formattedInTime;
+        earliestCheckinsByPerson[key].formattedOutTime = lastCheckinByPerson[key].formattedTime;
       }
     });
       
