@@ -49,9 +49,9 @@ function formatTimestamp(timestamp) {
         deviceName: checkin.deviceName !== undefined ? checkin.deviceName : "",
         date: checkin.date,
         timestamp: checkin.checkinTime,
-        formattedInTime: formatTimestamp(checkin.checkinTime),
+        formattedTime: date.concat(" ",formatTimestamp(checkin.checkinTime)),
+        formattedOutTime: "",
         outtimestamp: null,
-        formattedOutTime: null
       };
 
       if (
@@ -476,7 +476,7 @@ const App = () => {
                       <td>{result.aliasID || "N/A"}</td>
                       <td>{result.title || "N/A"}</td>
                       <td>
-                        {result.formattedInTime || "N/A"}
+                        {result.formattedTime || "N/A"}
                       </td>
                       <td>
                         {result.formattedOutTime || "N/A"}
