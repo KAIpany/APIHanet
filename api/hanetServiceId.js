@@ -13,9 +13,8 @@ function filterCheckinsByDay(data) {
         item.personName !== ""
     );
 
-    // Tạo một đối tượng tạm để theo dõi lần check-in đầu tiên của mỗi người theo ngày
-    const earliestCheckinsByPerson = {};
-    const lastCheckinByPerson = {};
+    // Tạo một đối tượng tạm để theo dõi lần check-in đầu và cuối của mỗi người theo ngày
+    const checkinsByPerson = {};
 
     validCheckins.forEach((checkin) => {
       const date = checkin.date;
@@ -37,32 +36,30 @@ function filterCheckinsByDay(data) {
         deviceName: checkin.deviceName !== undefined ? checkin.deviceName : "",
         date: checkin.date,
         timestamp: checkin.checkinTime,
-        formattedTime: date.concat(" ",formatTimestamp(checkin.checkinTime)),
+        checkoutTimestamp: checkin.checkinTime
       };
 
-      if (
-        !earliestCheckinsByPerson[personKey] ||
-        checkin.checkinTime < earliestCheckinsByPerson[personKey].timestamp
-      ) {
-        earliestCheckinsByPerson[personKey] = personInfo;
-      }
-      
-      if (
-        !lastCheckinByPerson[personKey] ||
-        checkin.checkinTime > lastCheckinByPerson[personKey].timestamp
-      ) {
-        lastCheckinByPerson[personKey] = personInfo;
+      if (!checkinsByPerson[personKey]) {
+        // Nếu là lần đầu gặp người này trong ngày
+        checkinsByPerson[personKey] = personInfo;
+      } else {
+        const existingRecord = checkinsByPerson[personKey];
+        
+        // Cập nhật thời gian check-in sớm nhất
+        if (checkin.checkinTime < existingRecord.timestamp) {
+          existingRecord.timestamp = checkin.checkinTime;
+        }
+        
+        // Cập nhật thời gian check-out muộn nhất
+        if (checkin.checkinTime > existingRecord.checkoutTimestamp) {
+          existingRecord.checkoutTimestamp = checkin.checkinTime;
+        }
       }
     });
-    Object.keys(earliestCheckinsByPerson).forEach((key) => {
-      earliestCheckinsByPerson[key]["outtimestamp"] = lastCheckinByPerson[key].timestamp;
-      earliestCheckinsByPerson[key]["outformatted"] = lastCheckinByPerson[key].formattedTime;
-    });
-      
-    const result = Object.values(earliestCheckinsByPerson).sort(
+
+    const result = Object.values(checkinsByPerson).sort(
       (a, b) => a.timestamp - b.timestamp
     );
-    
 
     return result;
   } catch (error) {
@@ -72,7 +69,7 @@ function filterCheckinsByDay(data) {
 }
 
 function formatTimestamp(timestamp) {
-  const date = new Date(timestamp * 60 * 60 * 7);
+  const date = new Date(timestamp);
   const hours = date.getHours().toString().padStart(2, "0");
   const minutes = date.getMinutes().toString().padStart(2, "0");
   const seconds = date.getSeconds().toString().padStart(2, "0");
@@ -83,7 +80,7 @@ require("dotenv").config();
 const axios = require("axios");
 const qs = require("qs");
 const tokenManager = require("./tokenManager");
-const HANET_API_BASE_URL = "https://partner.hanet.ai/person/getCheckinByPlaceIdInTimestamp";
+const HANET_API_BASE_URL = process.env.HANET_API_BASE_URL;
 
 if (!HANET_API_BASE_URL) {
   console.error("Lỗi: Biến môi trường HANET_API_BASE_URL chưa được thiết lập.");
@@ -101,7 +98,7 @@ if (!accessToken) {
 }
 let rawCheckinData = [];
 for (let index = 1; index <= 100000; index++) {
-  const apiUrl ="https://partner.hanet.ai/person/getCheckinByPlaceIdInTimestamp";
+  const apiUrl = `https://partner.hanet.ai/person/getCheckinByPlaceIdInTimestamp`;
   const requestData = {
     token: accessToken,
     placeID: placeId,
