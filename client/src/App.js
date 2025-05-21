@@ -1,6 +1,39 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./App.css"; // Sẽ tạo file CSS riêng
 
+// Hàm xử lý dữ liệu check-in
+const processCheckinData = (data) => {
+  const checkinsByPerson = {};
+
+  data.forEach((checkin) => {
+    const personKey = `${checkin.personID}`;
+    
+    if (!checkinsByPerson[personKey]) {
+      // Nếu là lần đầu gặp người này
+      checkinsByPerson[personKey] = {
+        personName: checkin.personName,
+        personID: checkin.personID,
+        aliasID: checkin.aliasID || "",
+        placeID: checkin.placeID,
+        title: checkin.title || "N/A",
+        timestamp: checkin.checkinTime, // Thời gian check-in đầu tiên
+        checkoutTimestamp: checkin.checkinTime // Khởi tạo thời gian check-out
+      };
+    } else {
+      // Cập nhật thời gian check-in sớm nhất
+      if (checkin.checkinTime < checkinsByPerson[personKey].timestamp) {
+        checkinsByPerson[personKey].timestamp = checkin.checkinTime;
+      }
+      // Cập nhật thời gian check-out muộn nhất
+      if (checkin.checkinTime > checkinsByPerson[personKey].checkoutTimestamp) {
+        checkinsByPerson[personKey].checkoutTimestamp = checkin.checkinTime;
+      }
+    }
+  });
+
+  return Object.values(checkinsByPerson);
+};
+
 const App = () => {
   const [formData, setFormData] = useState({
     placeId: "",
@@ -25,7 +58,7 @@ const App = () => {
     setPlaceError(null);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/place`
+        `https://api-hh5m.vercel.app/api/place`
       );
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -64,7 +97,7 @@ const App = () => {
     setDevices([]);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/device?placeId=${selectedPlaceId}`
+        `https://api-hh5m.vercel.app/api/device?placeId=${selectedPlaceId}`
       );
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -140,28 +173,30 @@ const App = () => {
     setSuccessMessage(null);
     setResultsData(null);
 
-    const params = new URLSearchParams();
-    if (formData.placeId) params.append("placeId", formData.placeId);
-    if (formData.deviceId) params.append("deviceId", formData.deviceId);
+    let requestBody = {
+      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE3OTQ4MzMyODE3MjcxNzAwMTUiLCJlbWFpbCI6InF1eW5oZG9uaHUyMUBnbWFpbC5jb20iLCJjbGllbnRfaWQiOiIxZGQxMzg3MjllZmE1YWU1MTc4MDQ4MzZmZGY1OThhMiIsInR5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJpYXQiOjE3NDc3NDk5MDQsImV4cCI6MTc3OTI4NTkwNH0.7FhMn4wm_w_VnrWJD-eKeSmfR2yZ7qJ8rgOh0Ewy_gU"
+    };
+
+    // Thêm placeID và deviceID nếu có
+    if (formData.placeId) requestBody.placeID = formData.placeId;
+    if (formData.deviceId) requestBody.deviceID = formData.deviceId;
+
     try {
+      // Xử lý thời gian
       if (formData.fromDateTime) {
-        params.append(
-          "dateFrom",
-          new Date(formData.fromDateTime).getTime().toString()
-        );
+        requestBody.from = new Date(formData.fromDateTime).getTime().toString();
       } else {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        params.append("dateFrom", today.getTime().toString());
+        requestBody.from = today.getTime().toString();
       }
+
       if (formData.toDateTime) {
-        params.append(
-          "dateTo",
-          new Date(formData.toDateTime).getTime().toString()
-        );
+        requestBody.to = new Date(formData.toDateTime).getTime().toString();
       } else {
-        params.append("dateTo", new Date().getTime().toString());
+        requestBody.to = new Date().getTime().toString();
       }
+
       if (
         formData.fromDateTime &&
         formData.toDateTime &&
@@ -176,25 +211,34 @@ const App = () => {
       setIsSubmitting(false);
       return;
     }
-    const queryString = params.toString();
-    setQueryString(queryString);
 
-    const apiUrl = `${process.env.REACT_APP_API_URL}/api/checkins?${queryString}`;
-    console.log("Đang gọi API:", apiUrl);
+    setQueryString(JSON.stringify(requestBody, null, 2) || "");
+
+    const apiUrl = "https://partner.hanet.ai/person/getCheckinByPlaceIdInTimestamp";
+    console.log("Đang gọi API:", apiUrl, "với body:", requestBody);
 
     try {
-      const response = await fetch(apiUrl);
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(requestBody).toString()
+      });
       const result = await response.json();
+      console.log(result);
 
-      if (!response.ok) {
+      if (result.returnCode !== 1) {
         throw new Error(
-          `Lỗi ${response.status}: ${result.message || "Không thể lấy dữ liệu"}`
+          `Lỗi: ${result.returnMessage || "Không thể lấy dữ liệu"}`
         );
       }
 
-      if (Array.isArray(result)) {
-        setResultsData(result);
-        setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
+      if (Array.isArray(result.data)) {
+        // Xử lý dữ liệu để lấy check-in đầu và check-out cuối
+        const processedData = processCheckinData(result.data);
+        setResultsData(processedData);
+        setSuccessMessage(`Tìm thấy ${processedData.length} kết quả.`);
       } else {
         setResultsData([]);
         setSuccessMessage(result.message || "Không tìm thấy kết quả nào.");
@@ -319,12 +363,12 @@ const App = () => {
           <label htmlFor="summaryInput" className="form-label-sm">
             Thông tin truy vấn:
           </label>
-          <input
-            type="text"
+          <textarea
             id="summaryInput"
             readOnly
-            value={`${process.env.REACT_APP_API_URL}/api/checkins?${queryString}`}
+            value={queryString}
             className="summary-input"
+            rows={5}
           />
         </div>
 
@@ -370,8 +414,8 @@ const App = () => {
                     <th>PlaceId</th>
                     <th>AliasID</th>
                     <th>Chức vụ</th>
-                    <th>Thời gian Checkin</th>
-                    <th>Thời gian Checkout</th>
+                    <th>Thời gian Check-in</th>
+                    <th>Thời gian Check-out</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -383,10 +427,14 @@ const App = () => {
                       <td>{result.aliasID || "N/A"}</td>
                       <td>{result.title || "N/A"}</td>
                       <td>
-                        {result.timestamp || "N/A"}
+                        {result.timestamp
+                          ? new Date(parseInt(result.timestamp)).toLocaleString("vi-VN")
+                          : "N/A"}
                       </td>
                       <td>
-                        {result.checkoutTimestamp || "N/A"}
+                        {result.checkoutTimestamp
+                          ? new Date(parseInt(result.checkoutTimestamp)).toLocaleString("vi-VN")
+                          : "N/A"}
                       </td>
                     </tr>
                   ))}
