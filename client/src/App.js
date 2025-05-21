@@ -383,10 +383,10 @@ const App = () => {
                       <td>{result.aliasID || "N/A"}</td>
                       <td>{result.title || "N/A"}</td>
                       <td>
-                        {result.formattedTime || "N/A"}
+                        {result.timestamp || "N/A"}
                       </td>
                       <td>
-                        {result.outformatted || "N/A"}
+                        {result.checkoutTimestamp || "N/A"}
                       </td>
                     </tr>
                   ))}
