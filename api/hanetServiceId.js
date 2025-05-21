@@ -83,7 +83,7 @@ require("dotenv").config();
 const axios = require("axios");
 const qs = require("qs");
 const tokenManager = require("./tokenManager");
-const HANET_API_BASE_URL = process.env.HANET_API_BASE_URL;
+const HANET_API_BASE_URL = "https://partner.hanet.ai/person/getCheckinByPlaceIdInTimestamp";
 
 if (!HANET_API_BASE_URL) {
   console.error("Lỗi: Biến môi trường HANET_API_BASE_URL chưa được thiết lập.");
@@ -101,7 +101,7 @@ if (!accessToken) {
 }
 let rawCheckinData = [];
 for (let index = 1; index <= 100000; index++) {
-  const apiUrl = `${HANET_API_BASE_URL}/person/getCheckinByPlaceIdInTimestamp`;
+  const apiUrl ="https://partner.hanet.ai/person/getCheckinByPlaceIdInTimestamp";
   const requestData = {
     token: accessToken,
     placeID: placeId,
