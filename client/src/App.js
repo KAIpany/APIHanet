@@ -1,92 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./App.css"; // Sẽ tạo file CSS riêng
 
-
-function formatTimestamp(timestamp) {
-    const date = new Date(timestamp);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  }
-  function filterCheckinsByDay(data) {
-  try {
-    if (!data || !Array.isArray(data)) {
-      console.error("Dữ liệu đầu vào không hợp lệ!");
-      return [];
-    }
-
-    const validCheckins = data.filter(
-      (item) =>
-        item.personID &&
-        item.personID !== "" &&
-        item.personName &&
-        item.personName !== ""
-    );
-
-    // Tạo một đối tượng tạm để theo dõi lần check-in đầu tiên của mỗi người theo ngày
-    const earliestCheckinsByPerson = {};
-    const lastCheckinByPerson = {};
-
-    validCheckins.forEach((checkin) => {
-      const date = checkin.date;
-      const personKey = `${date}_${checkin.personID}`;
-
-      // Format thông tin người check-in
-      const personInfo = {
-        personName: checkin.personName !== undefined ? checkin.personName : "",
-        personID: checkin.personID,
-        aliasID: checkin.aliasID !== undefined ? checkin.aliasID : "",
-        placeID: checkin.placeID !== undefined ? checkin.placeID : null,
-        title: checkin.title
-          ? typeof checkin.title === "string"
-            ? checkin.title.trim()
-            : "N/A"
-          : "Khách hàng",
-        type: checkin.type !== undefined ? checkin.type : null,
-        deviceID: checkin.deviceID !== undefined ? checkin.deviceID : "",
-        deviceName: checkin.deviceName !== undefined ? checkin.deviceName : "",
-        date: checkin.date,
-        timestamp: checkin.timestamp,
-        formattedTime: date.concat(" ",checkin.formattedTime),
-      };
-
-      if (
-        !earliestCheckinsByPerson[personKey] ||
-        checkin.checkinTime < earliestCheckinsByPerson[personKey].timestamp
-      ) {
-        earliestCheckinsByPerson[personKey] = personInfo;
-      }
-      
-      if (
-        !lastCheckinByPerson[personKey] ||
-        checkin.checkinTime > lastCheckinByPerson[personKey].timestamp
-      ) {
-        lastCheckinByPerson[personKey] = personInfo;
-      }
-    });
-    Object.keys(earliestCheckinsByPerson).forEach((key) => {  
-        console.log(key,earliestCheckinsByPerson[key]);
-        console.log(key,lastCheckinByPerson[key]);
-      if (lastCheckinByPerson[key]) {
-        earliestCheckinsByPerson[key].outtimestamp = lastCheckinByPerson[key].timestamp;
-        earliestCheckinsByPerson[key].formattedOutTime = lastCheckinByPerson[key].formattedTime;
-      }
-    });
-      
-    const result = Object.values(earliestCheckinsByPerson).sort(
-      (a, b) => a.timestamp - b.timestamp
-    );
-    
-
-    return result;
-  } catch (error) {
-    console.error("Lỗi khi xử lý dữ liệu:", error);
-    return [];
-  }
-}
-
-
 const App = () => {
   const [formData, setFormData] = useState({
     placeId: "",
@@ -279,8 +193,7 @@ const App = () => {
       }
 
       if (Array.isArray(result)) {
-        const filterItems = filterCheckinsByDay(result);
-        setResultsData(filterItems);
+        setResultsData(result);
         setSuccessMessage(`Tìm thấy ${result.length} kết quả.`);
       } else {
         setResultsData([]);
