@@ -386,7 +386,7 @@ const App = () => {
                         {result.formattedTime || "N/A"}
                       </td>
                       <td>
-                        {result.formattedOutTime || "N/A"}
+                        {result.outformatted || "N/A"}
                       </td>
                     </tr>
                   ))}
