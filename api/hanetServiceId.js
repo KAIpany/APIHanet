@@ -37,18 +37,18 @@ function filterCheckinsByDay(data) {
         deviceName: checkin.deviceName !== undefined ? checkin.deviceName : "",
         date: checkin.date,
         timestamp: checkin.checkinTime,
-        formattedTime: formatTimestamp(checkin.checkinTime),
+        formattedTime: date.concat(" ",formatTimestamp(checkin.checkinTime)),
       };
 
       if (
-        !earliestCheckinsByPerson[personKey.concat(date)] ||
+        !earliestCheckinsByPerson[personKey] ||
         checkin.checkinTime < earliestCheckinsByPerson[personKey].timestamp
       ) {
         earliestCheckinsByPerson[personKey] = personInfo;
       }
       
       if (
-        !lastCheckinByPerson[personKey.concat(date)] ||
+        !lastCheckinByPerson[personKey] ||
         checkin.checkinTime > lastCheckinByPerson[personKey].timestamp
       ) {
         lastCheckinByPerson[personKey] = personInfo;
@@ -56,6 +56,7 @@ function filterCheckinsByDay(data) {
     });
     Object.keys(earliestCheckinsByPerson).forEach((key) => {
       earliestCheckinsByPerson[key]["outtimestamp"] = lastCheckinByPerson[key].timestamp;
+      earliestCheckinsByPerson[key]["outformatted"] = lastCheckinByPerson[key].formattedTime;
     });
       
     const result = Object.values(earliestCheckinsByPerson).sort(
